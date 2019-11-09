@@ -39,19 +39,20 @@ podcasts = {
     
 class Command(BaseCommand):
     """
-    load all rss feed items from the init podcast feed,
-    loaded data would be populated into table podcast_db
-    and rssItem_db
+    load all rss feed items from the given podcast feed,
+    loaded data would be populated into database
 
     this command should only be executed once for each podcast
     after the database has been initialized
 
-    should also check if the given podcast already exists if
+    also check if the given podcast already exists if
     the list of podcast has been constantly changing
 
     """
     def handle(self, *args, **options):
         for name, data in podcasts.items():
+            if Podcast.objects.filter(name=name).exists():
+                continue
             rss_link = data[1]
             d = feedparser.parse(rss_link)
             self.collect_podcast(name, data, d)
@@ -77,10 +78,9 @@ class Command(BaseCommand):
         pd.save()
     
     def collect_rssItem(self, pc_name, parsed_data):
-        try:
-            pd = Podcast.objects.get(name=pc_name)
-        except Podcast.DoesNotExist:
-            raise CommandError('Podcast object with name {} does not exist'.format(pc_name))
+        pd = Podcast.objects.filter(name=pc_name).first()
+        if pd is None:
+            raise CommandError('Podcast with name {} does not exist'.format(pc_name))
         for item in parsed_data.entries:
             desc = strip_tags(item.summary)
             desc = ' '.join(desc.split()[:50]) if len(desc.split()) > 50 else desc
