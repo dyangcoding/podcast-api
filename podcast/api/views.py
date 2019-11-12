@@ -26,12 +26,16 @@ class PodcastViewSet(viewsets.ReadOnlyModelViewSet):
 
     @action(detail=True)
     def items(self, request, pk=None):
-        serializer_context = {
-            'request': request,
-        }
         podcast = Podcast.objects.get(id=pk)
-        results = RssItem.objects.filter(creator=podcast).all()
-        serializer = RssItemSerializer(results, context= serializer_context, many=True)
+        results = RssItem.objects \
+                    .filter(creator=podcast) \
+                    .all() \
+                    .order_by('-pub_date')
+        page = self.paginate_queryset(results)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(results, many=True)
         return Response(serializer.data)
 
 class RssItemViewSet(viewsets.ModelViewSet):
