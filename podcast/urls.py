@@ -24,12 +24,8 @@ router.register(r'users', views.UserViewSet)
 router.register(r'podcasts', views.PodcastViewSet)
 router.register(r'rssItems', views.RssItemViewSet)
 
-r2 = ItemsPerPodcastRouter()
-r2.register(r'podcast', views.PodcastViewSet)
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(router.urls)),
-    path('', include(r2.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]
