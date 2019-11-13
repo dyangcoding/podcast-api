@@ -1,5 +1,4 @@
 from django.db import models
-import uuid
 from enum import Enum, unique
 
 @unique
@@ -26,5 +25,5 @@ class RssItem(models.Model):
     description = models.CharField(max_length=8192)
     item_url = models.URLField()
     episode_number = models.IntegerField(default=0, null=True)
-    GUID = models.UUIDField(default=uuid.uuid4, editable=False)
-    creator = models.ForeignKey('Podcast', on_delete=models.CASCADE)
+    GUID = models.UUIDField(editable=False)
+    creator = models.ForeignKey('Podcast', related_name='items',on_delete=models.CASCADE)

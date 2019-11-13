@@ -11,6 +11,19 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+from django.core.exceptions import ImproperlyConfigured
+
+def get_env_variable(name):
+    """
+    Gets the environment variable or throws ImproperlyConfigured
+    exception
+    :rtype: object
+    """  
+    try:
+        return os.environ[name]    
+    except KeyError:
+        raise ImproperlyConfigured(
+            'Environment variable {} not found.'.format(name))
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -26,7 +39,14 @@ SECRET_KEY = 'g@bdt$miw@gdb2s-%apa)ga*w2_=t(f%#h%!x$--lmnvh$!-d8'
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:3000',
+]
+CORS_ORIGIN_REGEX_WHITELIST = [
+    'http://localhost:3000',
+]    
+ 
 
 # Application definition
 
@@ -39,6 +59,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'podcast.api',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -49,6 +70,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'podcast.urls'
