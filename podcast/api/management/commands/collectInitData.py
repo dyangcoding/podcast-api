@@ -34,6 +34,26 @@ podcasts = {
         'https://testandcode.com/',
         'https://testandcode.com/rss',
         1
+    ],
+    'Friday afternoon deploy': [
+        'https://friday.hirelofty.com',
+        'https://feeds.simplecast.com/7if5txYU',
+        1
+    ],
+    'Beyond the todo list': [
+        'https://beyondthetodolist.com',
+        'https://beyondthetodolist.com/rss',
+        2
+    ],
+    'Masters of Scale': [
+        'https://mastersofscale.com/',
+        'https://rss.art19.com/masters-of-scale',
+        2
+    ],
+    'Saas interviews with ceos, startups, founders': [
+        'https://nathanlatkathetop.libsyn.com/',
+        'https://nathanlatkathetop.libsyn.com/rss',
+        2
     ]
 }
     
@@ -52,6 +72,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         for name, data in podcasts.items():
             if Podcast.objects.filter(name=name).exists():
+                print('Skip podcast {}, already exists in the db'
+                        .format(name))
                 continue
             rss_link = data[1]
             d = feedparser.parse(rss_link)
@@ -64,7 +86,7 @@ class Command(BaseCommand):
         category = pc_data[2]
         pd = Podcast()
         pd.name = pc_name
-        pd.base_url = base_url
+        pd.base_url = base_url.split('://')[1].split('/')[0]
         pd.rss_link = rss_link
         pd.category = category
         if hasattr(parsed_data.feed, 'description'):
