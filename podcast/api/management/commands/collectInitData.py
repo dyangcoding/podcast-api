@@ -10,9 +10,9 @@ from django.utils.timezone import make_aware
 """
 a basic map to populate db
 each podcast name as key contains following entry as value
-
     base_url
     rss_link
+    category
 """
 podcasts = {
     'Talk python to me': [
@@ -54,6 +54,21 @@ podcasts = {
         'https://nathanlatkathetop.libsyn.com/',
         'https://nathanlatkathetop.libsyn.com/rss',
         2
+    ],
+    'How i Build this': [
+        'https://www.npr.org/podcasts/510313/how-i-built-this?t=1573735345664',
+        'https://www.npr.org/rss/podcast.php?id=510313',
+        2
+    ],
+    'The Dave Ramsey Show': [
+        'https://www.daveramsey.com/show/podcasts',
+        'http://daveramsey.ramsey.libsynpro.com/rss',
+        3
+    ],
+    'Money for the Rest of us': [
+        'https://moneyfortherestofus.com',
+        'https://rss.art19.com/money-for-the-rest-of-us',
+        3
     ]
 }
     
@@ -69,9 +84,44 @@ class Command(BaseCommand):
     the list of podcast has been constantly changing
 
     """
+    @staticmethod
+    def to_desc(text, size):
+        """
+        remove html tags and truncate the given string 
+        :text given string may contain html tags
+        :size max output size, 50 for item description, and 100 for podcast 
+        """
+        desc = strip_tags(text)
+        splitted = desc.split()
+        desc = ' '.join(splitted[:size]) if len(splitted) > size else desc
+        return desc
+
+    @staticmethod
+    def to_aware_datetime(date_parsed):
+        # converts date time tuple to datatime.datetime object
+        date = datetime.fromtimestamp(mktime(date_parsed))
+        # converts naive datetime object (without timezone info) to 
+        # the one that has timezone info
+        return make_aware(date)
+        
+    @staticmethod
+    def to_item_url(item):
+        """
+        get the item link 
+        if the link attribute is not present, find the link
+        from the 'enclosures' attribute
+        """
+        if hasattr(item, 'link'):
+            return item.link
+        return item.enclosures[0].href if hasattr(item, 'enclosures') else None
+
+    @staticmethod
+    def get_epi_number(item):
+        return item.itunes_episode if hasattr(item, 'itunes_episode') else None
+
     def handle(self, *args, **options):
         for name, data in podcasts.items():
-            if Podcast.objects.filter(name=name).exists():
+            if Podcast.objects.filter(name=name).exists(): 
                 print('Skip podcast {}, already exists in the db'
                         .format(name))
                 continue
@@ -81,22 +131,18 @@ class Command(BaseCommand):
             self.collect_rssItem(name, d)
 
     def collect_podcast(self, pc_name, pc_data, parsed_data):
-        base_url = pc_data[0]
-        rss_link = pc_data[1]
-        category = pc_data[2]
+        base_url, rss_link, category = pc_data[0], pc_data[1], pc_data[2]
         pd = Podcast()
         pd.name = pc_name
         pd.base_url = base_url.split('://')[1].split('/')[0]
         pd.rss_link = rss_link
         pd.category = category
         if hasattr(parsed_data.feed, 'description'):
-            desc = parsed_data.feed.description
-            splitted = desc.split()
-            pd.description = ' '.join(splitted[:100]) if len(splitted) > 100 else desc
+            pd.description = Command.to_desc(parsed_data.feed.description, 100)
         if hasattr(parsed_data, 'etag'):
             pd.etag = parsed_data.etag
         if hasattr(parsed_data, 'modified'):
-            pd.last_modified = parsed_data.modified 
+            pd.last_modified = parsed_data.modified
         pd.save()
     
     def collect_rssItem(self, pc_name, parsed_data):
@@ -104,19 +150,15 @@ class Command(BaseCommand):
         if pd is None:
             raise CommandError('Podcast with name {} does not exist'.format(pc_name))
         for item in parsed_data.entries:
-            desc = strip_tags(item.summary)
-            desc = ' '.join(desc.split()[:50]) if len(desc.split()) > 50 else desc
-            if hasattr(item, 'itunes_episode'):
-                eps_number = item.itunes_episode
-            # converts date time tuple to datatime.datetime object
-            date = datetime.fromtimestamp(mktime(item.published_parsed))
-            # converts naive datetime object (without timezone info) to 
-            # the one that has timezone info
-            aware_datetime = make_aware(date)
             RssItem.objects.create(title = item.title, 
-                            pub_date = aware_datetime,
-                            description = desc, 
-                            item_url = item.link,
-                            episode_number = eps_number, 
-                            GUID = uuid.uuid4(),
-                            creator = pd)
+                pub_date = Command.to_aware_datetime(item.published_parsed),
+                description = Command.to_desc(item.summary, 50), 
+                item_url = Command.to_item_url(item),
+                episode_number = Command.get_epi_number(item), 
+                GUID = uuid.uuid4(),
+                creator = pd)
+
+    
+    
+    
+
