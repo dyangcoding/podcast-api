@@ -5,6 +5,7 @@ from enum import Enum, unique
 class PodcastCategory(Enum):
     IT = 1
     Entrepreneurship = 2
+    Finance = 3
 
 class Podcast(models.Model):
     name = models.CharField(max_length=100, unique=True)
