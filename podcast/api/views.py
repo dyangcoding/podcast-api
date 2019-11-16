@@ -42,5 +42,14 @@ class RssItemViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows rss feed items to be viewed or edited.
     """
-    queryset = RssItem.objects.all()
     serializer_class = RssItemSerializer
+    def get_queryset(self):
+        """    
+        Optionally restricts the returned items to a given category,
+        by filtering against a `category` query parameter in the URL.
+        """
+        queryset = RssItem.objects.all()
+        category = self.request.query_params.get('category', None)
+        if category is not None:
+            queryset = queryset.filter(creator__category=category)
+        return queryset

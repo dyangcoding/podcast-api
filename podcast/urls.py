@@ -21,7 +21,7 @@ from podcast.api import views
 router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet)
 router.register(r'podcasts', views.PodcastViewSet)
-router.register(r'rssItems', views.RssItemViewSet)
+router.register(r'rssItems', views.RssItemViewSet, base_name='rssItems')
 
 urlpatterns = [
     path('admin/', admin.site.urls),

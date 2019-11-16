@@ -10,10 +10,13 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 
 class RssItemSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField()
-    
+    creator = serializers.CharField(source='creator.name')
+    category = serializers.CharField(source='creator.category')
+
     class Meta:
         model = RssItem
-        fields = ('id', 'title', 'pub_date', 'description', 'item_url', 'episode_number')
+        fields = ('id', 'title', 'pub_date', 'description', \
+            'item_url', 'episode_number', 'creator', 'category')
 
 class PodcastSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField()
