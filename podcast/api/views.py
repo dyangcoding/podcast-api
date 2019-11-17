@@ -48,7 +48,7 @@ class RssItemViewSet(viewsets.ModelViewSet):
         Optionally restricts the returned items to a given category,
         by filtering against a `category` query parameter in the URL.
         """
-        queryset = RssItem.objects.all()
+        queryset = RssItem.objects.all().order_by('-pub_date')
         category = self.request.query_params.get('category', None)
         if category is not None:
             queryset = queryset.filter(creator__category=category)
