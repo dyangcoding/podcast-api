@@ -27,4 +27,4 @@ class RssItem(models.Model):
     item_url = models.URLField()
     episode_number = models.IntegerField(default=0, null=True)
     GUID = models.UUIDField(editable=False)
-    creator = models.ForeignKey('Podcast', related_name='items',on_delete=models.CASCADE)
+    creator = models.ForeignKey('Podcast', related_name='items', on_delete=models.CASCADE)

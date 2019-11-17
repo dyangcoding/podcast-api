@@ -17,26 +17,7 @@ class PodcastViewSet(viewsets.ReadOnlyModelViewSet):
     API endpoint that allows podcasts to be viewed or edited.
     """
     queryset = Podcast.objects.all()
-
-    def get_serializer_class(self):
-        if self.action == 'items':
-            return RssItemSerializer
-        else:
-            return PodcastSerializer
-
-    @action(detail=True)
-    def items(self, request, pk=None):
-        podcast = Podcast.objects.get(id=pk)
-        results = RssItem.objects \
-                    .filter(creator=podcast) \
-                    .all() \
-                    .order_by('-pub_date')
-        page = self.paginate_queryset(results)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-        serializer = self.get_serializer(results, many=True)
-        return Response(serializer.data)
+    serializer_class = PodcastSerializer
 
 class RssItemViewSet(viewsets.ModelViewSet):
     """

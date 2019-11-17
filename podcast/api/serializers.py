@@ -10,7 +10,8 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 
 class PodcastSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField()
-
+    category = serializers.CharField(source='get_category_display')
+    
     class Meta:
         model = Podcast
         fields = ('id', 'name', 'base_url', 'category')
