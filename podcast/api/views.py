@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from rest_framework import viewsets
 from podcast.api.serializers import UserSerializer, RssItemSerializer, PodcastSerializer
 from .models import RssItem, Podcast
-from datetime import date
+from django.utils import timezone
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -42,13 +42,16 @@ class RssItemViewSet(viewsets.ModelViewSet):
 
         query_date = self.request.query_params.get('date', None)
         if query_date is not None:
-            today = date.today()
-            if date == 'Last 24':
-                queryset = queryset.filter(pub_date__day=today.day)
-            elif date == 'Past Week':
-                queryset = queryset.filter(pub_date__week=today.week)
-            elif date == 'Past Month':
-                queryset = queryset.filter(pub_date__month=today.month)
+            if query_date == 'Last 24':
+                time = timezone.now() - timezone.timedelta(days=1)
+                queryset = queryset.filter(pub_date__gte=time)
+            elif query_date == 'Past Week':
+                time = timezone.now() - timezone.timedelta(days=7)
+                queryset = queryset.filter(pub_date__gte=time)
+            elif query_date == 'Past Month':
+                time = timezone.now() - timezone.timedelta(days=30)
+                queryset = queryset.filter(pub_date__gte=time)
             else:
-                queryset = queryset.filter(pub_date__year=today.year)
+                time = timezone.now() - timezone.timedelta(days=365)
+                queryset = queryset.filter(pub_date__gte=time)
         return queryset
