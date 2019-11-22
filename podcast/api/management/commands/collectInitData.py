@@ -1,97 +1,9 @@
 from django.core.management.base import BaseCommand, CommandError
 from podcast.api.models import Podcast, RssItem
 import feedparser
-from django.utils.html import strip_tags
-from datetime import datetime
-from time import mktime
+from ._utils import *
+from ._podcastsRef import podcasts
 import uuid
-from django.utils.timezone import make_aware
-
-"""
-a basic map to populate db
-each podcast name served as a key which contains 
-following entry as value
-    base_url
-    rss_link
-    category
-"""
-podcasts = {
-    'Talk python to me': [
-        'https://talkpython.fm',
-        'https://talkpython.fm/episodes/rss',
-        1
-    ],
-    'Djangochat': [
-        'https://djangochat.com/',
-        'https://feeds.simplecast.com/WpQaX_cs',
-        1
-    ],
-    'Python podcast init': [
-        'https://www.pythonpodcast.com/',
-        'https://www.pythonpodcast.com/feed/mp3/',
-        1
-    ],
-    'Test & code': [
-        'https://testandcode.com/',
-        'https://testandcode.com/rss',
-        1
-    ],
-    'Friday afternoon deploy': [
-        'https://friday.hirelofty.com',
-        'https://feeds.simplecast.com/7if5txYU',
-        1
-    ],
-    'Beyond the todo list': [
-        'https://beyondthetodolist.com',
-        'https://beyondthetodolist.com/rss',
-        2
-    ],
-    'Masters of Scale': [
-        'https://mastersofscale.com/',
-        'https://rss.art19.com/masters-of-scale',
-        2
-    ],
-    'Saas interviews with ceos, startups, founders': [
-        'https://nathanlatkathetop.libsyn.com/',
-        'https://nathanlatkathetop.libsyn.com/rss',
-        2
-    ],
-    'How i Build this': [
-        'https://www.npr.org/podcasts/510313/how-i-built-this?t=1573735345664',
-        'https://www.npr.org/rss/podcast.php?id=510313',
-        2
-    ],
-    'The Dave Ramsey Show': [
-        'https://www.daveramsey.com/show/podcasts',
-        'http://daveramsey.ramsey.libsynpro.com/rss',
-        3
-    ],
-    'Money for the Rest of us': [
-        'https://moneyfortherestofus.com',
-        'https://rss.art19.com/money-for-the-rest-of-us',
-        3
-    ],
-    'Mad Fientist': [
-        'https://www.madfientist.com',
-        'https://www.madfientist.com/feed',
-        3
-    ],
-    '2 Frugal Dudes': [
-        'https://2frugaldudes.com',
-        'https://2frugaldudes.com/feed/podcast',
-        3
-    ],
-    'Maven Money Personal Finance Podcast': [
-        'https://mavenmoney.libsyn.com',
-        'http://mavenmoney.libsyn.com/rss',
-        3
-    ],
-    'Retirement Lifestyle Advocates': [
-        'http://www.everythingfinancialradio.com',
-        'http://www.everythingfinancialradio.com/feed/podcast/',
-        3
-    ]
-}
     
 class Command(BaseCommand):
     """
@@ -124,7 +36,7 @@ class Command(BaseCommand):
         pd.rss_link = rss_link
         pd.category = category
         if hasattr(parsed_data.feed, 'description'):
-            pd.description = Command.to_desc(parsed_data.feed.description, 100)
+            pd.description = to_desc(parsed_data.feed.description, 100)
         if hasattr(parsed_data, 'etag'):
             pd.etag = parsed_data.etag
         if hasattr(parsed_data, 'modified'):
@@ -137,54 +49,12 @@ class Command(BaseCommand):
             raise CommandError('Podcast with name {} does not exist'.format(pc_name))
         for item in parsed_data.entries:
             RssItem.objects.create(title = item.title, 
-                pub_date = Command.to_aware_datetime(item.published_parsed),
-                description = Command.to_desc(item.summary, 50), 
-                item_url = Command.to_item_url(item),
-                episode_number = Command.get_epi_number(item), 
+                pub_date = to_aware_datetime(item.published_parsed),
+                description = to_desc(item.summary, 50), 
+                item_url = to_item_url(item),
+                episode_number = get_epi_number(item), 
                 GUID = uuid.uuid4(),
                 creator = pd)
-
-    @staticmethod
-    def to_desc(text, size):
-        """
-        remove html tags and truncate the given string 
-        
-        :text given string may contain html tags
-        :size max output size, 50 for item description, 100 for podcast 
-        """
-        desc = strip_tags(text)
-        splitted = desc.split()
-        desc = ' '.join(splitted[:size]) if len(splitted) > size else desc
-        return desc
-
-    @staticmethod
-    def to_aware_datetime(date_parsed):
-        """
-        converts date time tuple to datatime.datetime object
-        serve naive datetime object (without timezone info) to 
-        the one that has timezone info
-        
-        :date_parsed
-        """
-        date = datetime.fromtimestamp(mktime(date_parsed))
-        return make_aware(date)
-        
-    @staticmethod
-    def to_item_url(item):
-        """
-        get the item link 
-        if the link attribute is not present, set the link
-        to the url of 'enclosures' attribute
-
-        :item
-        """
-        if hasattr(item, 'link'):
-            return item.link
-        return item.enclosures[0].href if hasattr(item, 'enclosures') else None
-
-    @staticmethod
-    def get_epi_number(item):
-        return item.itunes_episode if hasattr(item, 'itunes_episode') else None
     
     
 
