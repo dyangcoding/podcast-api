@@ -7,3 +7,7 @@ __pycache__/
 migrations/
 
 venv/
+
+requirements.txt
+
+podcast/settings/
