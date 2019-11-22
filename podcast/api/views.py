@@ -2,8 +2,6 @@ from django.contrib.auth.models import User
 from rest_framework import viewsets
 from podcast.api.serializers import UserSerializer, RssItemSerializer, PodcastSerializer
 from .models import RssItem, Podcast
-from rest_framework.response import Response
-from rest_framework.decorators import action
 from datetime import date
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -36,7 +34,7 @@ class RssItemViewSet(viewsets.ModelViewSet):
         Optionally restricts the returned items to a given category,
         by filtering against a `category` query parameter in the URL.
         """
-        queryset = RssItem.objects.all().order_by('pub_date')
+        queryset = RssItem.objects.all().order_by('-pub_date')
         category = self.request.query_params.get('category', None)
         if category is not None:
             queryKey = self.cat_queryKey_mapper[category]
