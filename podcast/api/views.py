@@ -3,6 +3,9 @@ from rest_framework import viewsets
 from podcast.api.serializers import UserSerializer, RssItemSerializer, PodcastSerializer
 from .models import RssItem, Podcast
 from django.utils import timezone
+from django.db.models import Q
+from operator import or_
+from functools import reduce
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -28,6 +31,13 @@ class RssItemViewSet(viewsets.ModelViewSet):
         'Finance': 3
     }
 
+    date_querykey_mapper = {
+        'Last 24': 1,
+        'Past Week': 7,
+        'Past Month': 30,
+        'Past Year': 365
+    }
+
     serializer_class = RssItemSerializer
     def get_queryset(self):
         """    
@@ -42,16 +52,17 @@ class RssItemViewSet(viewsets.ModelViewSet):
 
         query_date = self.request.query_params.get('date', None)
         if query_date is not None:
-            if query_date == 'Last 24':
-                time = timezone.now() - timezone.timedelta(days=1)
-                queryset = queryset.filter(pub_date__gte=time)
-            elif query_date == 'Past Week':
-                time = timezone.now() - timezone.timedelta(days=7)
-                queryset = queryset.filter(pub_date__gte=time)
-            elif query_date == 'Past Month':
-                time = timezone.now() - timezone.timedelta(days=30)
-                queryset = queryset.filter(pub_date__gte=time)
-            else:
-                time = timezone.now() - timezone.timedelta(days=365)
-                queryset = queryset.filter(pub_date__gte=time)
+            day_from_now = self.date_querykey_mapper[query_date]
+            time = timezone.now() - timezone.timedelta(days=day_from_now)
+            queryset = queryset.filter(pub_date__gte=time)
+
+        search_key = self.request.query_params.get('search', None)
+        if search_key is not None:
+            q_list = [Q(title__icontains=search_key), 
+                        Q(description__icontains=search_key),
+                        Q(creator__name__icontains=search_key),
+                        Q(creator__base_url__icontains=search_key)]
+            filter_key = reduce(or_, q_list)
+            queryset = queryset.filter(filter_key) 
+
         return queryset
