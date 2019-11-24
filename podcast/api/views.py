@@ -7,23 +7,23 @@ from django.db.models import Q
 from operator import or_
 from functools import reduce
 
-class UserViewSet(viewsets.ModelViewSet):
+class UserViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    API endpoint that allows users to be viewed or edited.
+    API endpoint that allows users to be viewed.
     """
     queryset = User.objects.all().order_by('-date_joined')
     serializer_class = UserSerializer
 
 class PodcastViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    API endpoint that allows podcasts to be viewed or edited.
+    API endpoint that allows podcasts to be viewed.
     """
     queryset = Podcast.objects.all()
     serializer_class = PodcastSerializer
 
-class RssItemViewSet(viewsets.ModelViewSet):
+class RssItemViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    API endpoint that allows rss feed items to be viewed or edited.
+    API endpoint that allows rss feed items to be viewed.
     """
     cat_queryKey_mapper = {
         'IT': 1,
