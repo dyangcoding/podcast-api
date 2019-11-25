@@ -32,6 +32,11 @@ podcasts = {
         'https://feeds.simplecast.com/7if5txYU',
         1
     ],
+    'If/else': [
+        'https://ifelsepodcast.com',
+        'https://rss.cto.ai/ifelse',
+        1
+    ],
     'Beyond the todo list': [
         'https://beyondthetodolist.com',
         'https://beyondthetodolist.com/rss',
