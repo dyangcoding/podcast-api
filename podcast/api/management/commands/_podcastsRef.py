@@ -37,6 +37,16 @@ podcasts = {
         'https://rss.cto.ai/ifelse',
         1
     ],
+    'Real Talk Javascript': [
+        'https://realtalkjavascript.simplecast.com',
+        'https://feeds.simplecast.com/tOjNXec5',
+        1
+    ],
+    'JS Party': [
+        'https://changelog.com/jsparty',
+        'https://changelog.com/jsparty/feed',
+        1
+    ],
     'Beyond the todo list': [
         'https://beyondthetodolist.com',
         'https://beyondthetodolist.com/rss',
