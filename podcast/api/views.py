@@ -32,10 +32,10 @@ class RssItemViewSet(viewsets.ReadOnlyModelViewSet):
     }
 
     date_querykey_mapper = {
-        'Last 24': 1,
-        'Past Week': 7,
-        'Past Month': 30,
-        'Past Year': 365
+        'Last24': 1,
+        'PastWeek': 7,
+        'PastMonth': 30,
+        'PastYear': 365
     }
 
     serializer_class = RssItemSerializer
