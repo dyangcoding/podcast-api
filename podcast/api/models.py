@@ -26,5 +26,10 @@ class RssItem(models.Model):
     description = models.CharField(max_length=8192)
     item_url = models.URLField()
     episode_number = models.IntegerField(default=0, null=True)
+    likes = models.IntegerField(default=0)
     GUID = models.UUIDField(editable=False)
     creator = models.ForeignKey('Podcast', related_name='items', on_delete=models.CASCADE)
+
+    def set_likes(self, likes):
+        self.likes = likes
+        self.save()

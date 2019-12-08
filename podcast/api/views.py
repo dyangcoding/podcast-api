@@ -1,11 +1,13 @@
 from django.contrib.auth.models import User
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from podcast.api.serializers import UserSerializer, RssItemSerializer, PodcastSerializer
 from .models import RssItem, Podcast
 from django.utils import timezone
 from django.db.models import Q
 from operator import or_
 from functools import reduce
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     """
@@ -21,7 +23,7 @@ class PodcastViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Podcast.objects.all()
     serializer_class = PodcastSerializer
 
-class RssItemViewSet(viewsets.ReadOnlyModelViewSet):
+class RssItemViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows rss feed items to be viewed.
     """
@@ -66,3 +68,14 @@ class RssItemViewSet(viewsets.ReadOnlyModelViewSet):
             queryset = queryset.filter(filter_key) 
 
         return queryset
+    
+    @action(detail=True, methods=['post'])
+    def upVote(self, request, pk=None):
+        item = self.get_object()
+        serializer = RssItemSerializer(data=request.data)
+        if serializer.is_valid():
+            item.set_likes(serializer.data['likes'])
+            return Response({'status': 'updated item likes count'})
+        else:
+            return Response(serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST)
