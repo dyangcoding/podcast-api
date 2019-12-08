@@ -7,6 +7,12 @@ from django.db.models import Q
 from operator import or_
 from functools import reduce
 from rest_framework.response import Response
+from rest_framework.exceptions import APIException
+
+class MethodUnavailable(APIException):
+    status_code = 503
+    default_detail = 'Patch Method is only available through podcastclub.net.'
+    default_code = 'method_unavailable'
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     """
@@ -91,7 +97,11 @@ class RssItemViewSet(UpdateModelMixin, viewsets.ReadOnlyModelViewSet):
         return queryset
     
     def partial_update(self, request, *args, **kwargs):
-        item = self.get_object()
-        item.upVote()
+        try: 
+         if (request.data['upVote']):
+            item = self.get_object()
+            item.upVote()
+        except KeyError:
+            raise MethodUnavailable
         return super().partial_update(request, *args, **kwargs)
         

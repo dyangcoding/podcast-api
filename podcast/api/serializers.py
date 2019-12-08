@@ -22,6 +22,6 @@ class RssItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = RssItem
-        fields = ('id', 'title', 'pub_date', 'description', \
-            'item_url', 'episode_number', 'likes', 'creator')
+        fields = ['id', 'title', 'pub_date', 'description', \
+            'item_url', 'episode_number', 'likes', 'creator']
         
