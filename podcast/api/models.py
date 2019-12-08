@@ -30,6 +30,6 @@ class RssItem(models.Model):
     GUID = models.UUIDField(editable=False)
     creator = models.ForeignKey('Podcast', related_name='items', on_delete=models.CASCADE)
 
-    def set_likes(self, likes):
-        self.likes = likes
+    def upVote(self):
+        self.likes = self.likes + 1
         self.save()

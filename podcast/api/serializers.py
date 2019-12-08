@@ -14,7 +14,7 @@ class PodcastSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Podcast
-        fields = ('id', 'name', 'base_url', 'category')
+        fields = ['id', 'name', 'base_url', 'category']
         
 class RssItemSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField()
