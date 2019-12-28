@@ -52,6 +52,11 @@ podcasts = {
         'https://beyondthetodolist.com/rss',
         2
     ],
+    'Full Stack Radio': [
+        'http://www.fullstackradio.com',
+        'https://rss.simplecast.com/podcasts/279/rss',
+        1
+    ],
     'Masters of Scale': [
         'https://mastersofscale.com/',
         'https://rss.art19.com/masters-of-scale',
