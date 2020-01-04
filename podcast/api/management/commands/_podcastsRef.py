@@ -47,6 +47,11 @@ podcasts = {
         'https://changelog.com/jsparty/feed',
         1
     ],
+    'Software Engineering Daily': [
+        'https://softwareengineeringdaily.com/archives',
+        'https://softwareengineeringdaily.com/feed/podcast/',
+        1
+    ],
     'Beyond the todo list': [
         'https://beyondthetodolist.com',
         'https://beyondthetodolist.com/rss',
