@@ -37,6 +37,8 @@ class Command(BaseCommand):
         pd.category = category
         if hasattr(parsed_data.feed, 'description'):
             pd.description = to_desc(parsed_data.feed.description, 100)
+        if hasattr(parsed_data.feed, 'image'):
+            pd.image_url = parsed_data.feed.image.href
         if hasattr(parsed_data, 'etag'):
             pd.etag = parsed_data.etag
         if hasattr(parsed_data, 'modified'):

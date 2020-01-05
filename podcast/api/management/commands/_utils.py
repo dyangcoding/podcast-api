@@ -29,14 +29,42 @@ def to_aware_datetime(date_parsed):
 def to_item_url(item):
     """
     get the item link 
-    if the link attribute is not present, set the link
-    to the url of 'enclosures' attribute
 
     :item
     """
-    if hasattr(item, 'link'):
-        return item.link
+    
+    return item.link if hasattr(item, 'link') else None
+    
+def to_item_enclosure(item):
+    """
+    get the item enclosure
+
+    :item
+    """
     return item.enclosures[0].href if hasattr(item, 'enclosures') else None
+
+def to_summary(item):
+    """
+    get item summary
+
+    :item
+    """
+
+    return item.itunes_summary if hasattr(item, 'itunes_summary') else None
+
+def to_image(podcast):
+    """
+
+    """
+
+    return
+
+def to_duration(item):
+    """
+    get the item enclosure duration
+
+    :return duration in second
+    """
 
 def get_epi_number(item):
     return item.itunes_episode if hasattr(item, 'itunes_episode') else None

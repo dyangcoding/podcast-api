@@ -12,6 +12,7 @@ class Podcast(models.Model):
     description = models.CharField(max_length=4096, default=None)
     base_url = models.URLField(default=None)
     rss_link = models.URLField(default=None)
+    image_url = models.URLField(default=None)
     category = models.IntegerField(choices= 
                 [(tag.value, tag) for tag in PodcastCategory])
     last_modified = models.CharField(max_length=100, null=True)
@@ -25,6 +26,9 @@ class RssItem(models.Model):
     pub_date = models.DateTimeField()
     description = models.CharField(max_length=8192)
     item_url = models.URLField()
+    summary = models.TextField(default=None)
+    duration = models.IntegerField(default=0)
+    enclosure = models.URLField()
     episode_number = models.IntegerField(default=0, null=True)
     likes = models.IntegerField(default=0)
     GUID = models.UUIDField(editable=False)
