@@ -41,23 +41,12 @@ def to_item_enclosure(item):
 
     :item
     """
-    return item.enclosures[0].href if hasattr(item, 'enclosures') else None
-
-def to_summary(item):
-    """
-    get item summary
-
-    :item
-    """
-
-    return item.itunes_summary if hasattr(item, 'itunes_summary') else None
-
-def to_image(podcast):
-    """
-
-    """
-
-    return
+    if not hasattr(item, 'enclosures'):
+        return None
+    enclosures = item.enclosures
+    if len(enclosures) == 0:
+        return None 
+    return enclosures[0].href
 
 def to_duration(item):
     """
@@ -65,6 +54,22 @@ def to_duration(item):
 
     :return duration in second
     """
+    if not hasattr(item, 'itunes_duration'):
+        return 0
+    duration = item.itunes_duration
+    hour_minute_second = duration.split(':')
+    length = len(hour_minute_second)
+    if length == 1:
+        return int(hour_minute_second[0])
+    elif length == 2:
+        minute = int(hour_minute_second[0])
+        second = int(hour_minute_second[1])
+        return 60 * minute + second
+    else:
+        hour = int(hour_minute_second[0])
+        minute = int(hour_minute_second[1])
+        second = int(hour_minute_second[2])
+        return 3600 * hour + 60 * minute + second
 
 def get_epi_number(item):
     return item.itunes_episode if hasattr(item, 'itunes_episode') else None
