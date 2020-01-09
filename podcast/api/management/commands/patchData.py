@@ -33,7 +33,8 @@ class Command(BaseCommand):
         for item in parsed_data.entries:
             item_instance = RssItem.objects.filter(title=item.title).first()
             if item_instance is None:
-                print('No Item {} exists within database.'.format((item.title).encode('utf-8')))
+                print('No Item {} exists within database.' \
+                        .format((item.title).encode('utf-8')))
                 continue
             item_instance.summary = item.summary
             # seperate item link and enclosure 

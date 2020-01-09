@@ -14,14 +14,22 @@ class PodcastSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Podcast
-        fields = ['id', 'name', 'base_url', 'category']
+        fields = ['id', 'name', 'base_url', 'image_url', 'category']
         
-class RssItemSerializer(serializers.ModelSerializer):
+class RssItemRetrieveSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField()
     creator = PodcastSerializer()
 
     class Meta:
         model = RssItem
         fields = ['id', 'title', 'pub_date', 'description', \
-            'item_url', 'episode_number', 'likes', 'creator']
-        
+                'item_url', 'enclosure', 'duration', 'summary', \
+                'episode_number', 'likes', 'creator']
+
+class RssItemListSerializer(serializers.ModelSerializer):
+    id = serializers.ReadOnlyField()
+    creator = PodcastSerializer()
+
+    class Meta:
+        model = RssItem
+        fields = ['id', 'title', 'pub_date', 'item_url', 'creator']

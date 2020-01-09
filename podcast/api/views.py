@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import viewsets, status
-from podcast.api.serializers import UserSerializer, RssItemSerializer, PodcastSerializer
+from podcast.api.serializers import *
 from .models import RssItem, Podcast
 from django.utils import timezone
 from django.db.models import Q
@@ -67,7 +67,6 @@ class RssItemViewSet(UpdateModelMixin, viewsets.ReadOnlyModelViewSet):
         'Past Year': 365
     }
 
-    serializer_class = RssItemSerializer
     def get_queryset(self):
         """    
         Optionally restricts the returned items to a given category,
@@ -104,4 +103,9 @@ class RssItemViewSet(UpdateModelMixin, viewsets.ReadOnlyModelViewSet):
         except KeyError:
             raise MethodUnavailable
         return super().partial_update(request, *args, **kwargs)
+    
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return RssItemListSerializer        
+        return RssItemRetrieveSerializer
         
