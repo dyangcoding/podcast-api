@@ -8,11 +8,16 @@ from operator import or_
 from functools import reduce
 from rest_framework.response import Response
 from rest_framework.exceptions import APIException
+from rest_framework.pagination import PageNumberPagination
 
 class MethodUnavailable(APIException):
     status_code = 503
     default_detail = 'Patch Method is only available through podcastclub.net.'
     default_code = 'method_unavailable'
+
+class RelatedItemResultSetPagination(PageNumberPagination):
+    page_size = 8
+    page_size_query_param = 'page_size'
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     """
@@ -49,16 +54,17 @@ class UpdateModelMixin(object):
     def perform_update(self, serializer):
         serializer.save()
 
+category_queryKey_mapper = {
+    'IT': 1,
+    'Entrepreneurship': 2,
+    'Finance': 3
+}
+
 class RssItemViewSet(UpdateModelMixin, viewsets.ReadOnlyModelViewSet):
     """
     API endpoint that allows rss feed items to be viewed or 
     updated through partial update.
     """
-    cat_queryKey_mapper = {
-        'IT': 1,
-        'Entrepreneurship': 2,
-        'Finance': 3
-    }
 
     date_querykey_mapper = {
         'Last 24': 1,
@@ -69,13 +75,17 @@ class RssItemViewSet(UpdateModelMixin, viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         """    
-        Optionally restricts the returned items to a given category,
-        by filtering against a `category` query parameter in the URL.
+        Optionally restricts the returned items,
+        by filtering against
+            `category` 
+            `date`
+            `search input`
+            query parameter in the URL.
         """
         queryset = RssItem.objects.all().order_by('-pub_date')
         category = self.request.query_params.get('category', None)
         if category is not None:
-            queryKey = self.cat_queryKey_mapper[category]
+            queryKey = category_queryKey_mapper[category]
             queryset = queryset.filter(creator__category=queryKey)
 
         query_date = self.request.query_params.get('date', None)
@@ -108,4 +118,25 @@ class RssItemViewSet(UpdateModelMixin, viewsets.ReadOnlyModelViewSet):
         if self.action == 'list':
             return RssItemListSerializer        
         return RssItemRetrieveSerializer
+
+class RssItemRelatedViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    API endpoint that returns related RSS items based on a given category
+    """
+    pagination_class = RelatedItemResultSetPagination
+
+    def get_queryset(self):
+        exclude = self.request.query_params.get('exclude', None)
+        if exclude is not None:
+            queryset = RssItem.objects.exclude(id=exclude).order_by('-pub_date')
+        category = self.request.query_params.get('category', None)
+        if category is not None:
+            queryKey = category_queryKey_mapper[category]
+            queryset = queryset.filter(creator__category=queryKey)
+
+        return queryset
         
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return RssItemListSerializer        
+        return RssItemRetrieveSerializer

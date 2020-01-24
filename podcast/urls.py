@@ -22,6 +22,7 @@ router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet)
 router.register(r'podcasts', views.PodcastViewSet)
 router.register(r'rssItems', views.RssItemViewSet, base_name='rssItems')
+router.register(r'relatedItems', views.RssItemRelatedViewSet, base_name='rssItemsRelated')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
