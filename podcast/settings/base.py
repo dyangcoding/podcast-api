@@ -55,7 +55,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework.authtoken',
     'podcast.api',
+    'podcast.tokenauth',
     'corsheaders',
 ]
 
@@ -148,3 +150,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'podcast.api.pagination.RssItemPagination.RssItemResultsSetPagination',
     'PAGE_SIZE': 20
 }
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+)

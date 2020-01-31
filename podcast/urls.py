@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
 from podcast.api import views
+from podcast.tokenauth.urls import urlpatterns as auth_path
 
 router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet)
@@ -29,4 +30,6 @@ urlpatterns = [
     path('api/', include(router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     #path('gen_url/', include('libthumbor.django.urls'))
+    #path("auth/", include("tokenauth.urls", namespace="tokenauth"))
+    path('auth/', include(auth_path))
 ]
