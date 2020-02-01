@@ -58,8 +58,11 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'podcast.api',
     'podcast.tokenauth',
+    'podcast.users',
     'corsheaders',
 ]
+
+AUTH_USER_MODEL = 'users.ClubUser'
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',

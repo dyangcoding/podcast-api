@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+from ..users.models import ClubUser
 from rest_framework import viewsets, status
 from podcast.api.serializers import *
 from .models import RssItem, Podcast
@@ -23,8 +23,8 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     """
     API endpoint that allows users to be viewed.
     """
-    queryset = User.objects.all().order_by('-date_joined')
-    serializer_class = UserSerializer
+    queryset = ClubUser.objects.all().order_by('-date_joined')
+    serializer_class = ClubUserSerializer
 
 class PodcastViewSet(viewsets.ReadOnlyModelViewSet):
     """

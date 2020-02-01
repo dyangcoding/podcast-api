@@ -1,12 +1,12 @@
-from django.contrib.auth.models import User
+from ..users.models import ClubUser
 from rest_framework import serializers
 from .models import Podcast, RssItem
 from django.core.paginator import Paginator
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
+class ClubUserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = User
-        fields = ['username', 'email', 'groups']  
+        model = ClubUser
+        fields = ['display_name', 'email']  
 
 class PodcastSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField()
