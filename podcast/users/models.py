@@ -37,6 +37,7 @@ class ClubUser(AbstractBaseUser, PermissionsMixin):
 
     Email is required. Other fields are optional.
     """
+    password=None
     email = models.EmailField(_('email address'), max_length=254, unique=True)
     display_name = models.CharField(_('display name'), max_length=30, blank=True)
     is_staff = models.BooleanField(_('staff status'), default=False,

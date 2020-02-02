@@ -7,6 +7,11 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework.decorators import api_view
 from rest_framework.decorators import parser_classes
 from rest_framework.parsers import JSONParser
+from django.contrib.auth import login as djlogin
+from django.contrib.auth import logout as djlogout
+
+from . import settings as ta_settings
+from .helpers import email_login_link
 
 @api_view(['POST'])
 @parser_classes([JSONParser])
@@ -14,15 +19,31 @@ def email_post(request, format=None):
     """Process the submission of the form with the user's 
         email and mail them a link.
     """
-    email = request.data['email']
-    print('submitted email'.format(email))
+    if request.user.is_authenticated:
+        pass
+
+    email = ta_settings.NORMALIZE_EMAIL(request.data['email'])
+    
+    if not email:
+        pass
+    email_login_link(request, email)
+    
     return Response({'received data': request.data})
 
 @api_view(['POST'])
 @parser_classes([JSONParser])
 def token_post(request, token):
-    pass
+    """Validate the token the user submitted."""
+    user = authenticate(request, token=token)
+    if user is None:
+        pass
+
+    if request.user.is_authenticated:
+        pass
+
+    djlogin(request, user)
 
 @login_required
 def logout(request):
+    djlogout(request)
     pass
