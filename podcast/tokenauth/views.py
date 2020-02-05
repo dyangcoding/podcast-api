@@ -13,19 +13,22 @@ from django.contrib.auth import logout as djlogout
 from . import settings as ta_settings
 from .helpers import email_login_link
 
+from podcast.users.models import ClubUser
+
 @api_view(['POST'])
 @parser_classes([JSONParser])
 def email_post(request, format=None):
-    """Process the submission of the form with the user's 
-        email and mail them a link.
+    """
+    Process the submission of the form with the user's 
+    email and mail them a link.
     """
     if request.user.is_authenticated:
         pass
 
     email = ta_settings.NORMALIZE_EMAIL(request.data['email'])
-    
     if not email:
-        pass
+        return Response({'Error': "Please provide email"}, status="400")
+
     email_login_link(request, email)
     
     return Response({'received data': request.data})

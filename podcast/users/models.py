@@ -17,8 +17,9 @@ class ClubUserManager(BaseUserManager):
         if not email:
             raise ValueError('The given email must be set')
         email = self.normalize_email(email)
+        # user is inactive per default
         user = self.model(email=email,
-                          is_staff=is_staff, is_active=True,
+                          is_staff=is_staff, is_active=False,
                           is_superuser=is_superuser, last_login=now,
                           date_joined=now, **extra_fields)
         user.save(using=self._db)

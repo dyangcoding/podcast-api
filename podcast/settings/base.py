@@ -155,5 +155,7 @@ REST_FRAMEWORK = {
 }
 
 AUTHENTICATION_BACKENDS = (
-    'django.contrib.auth.backends.ModelBackend',
+    'podcast.tokenauth.auth_backends',
 )
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
