@@ -5,7 +5,7 @@ from . import settings as ta_settings
 from rest_framework.authentication import get_authorization_header
 from rest_framework.response import Response
 from podcast.settings.base import get_env_variable
-import jwt, json
+import jwt
 
 class JWTTokenBackend:
     def get_user(self, user_id):
@@ -38,24 +38,21 @@ class JWTTokenBackend:
             msg = 'Invalid token header. Token string should not contain invalid characters.'
             raise exceptions.AuthenticationFailed(msg)
 
-        return self.authenticate_credentials(token)
+        return self.authenticate_credentials(request, token)
     
-    def authenticate_credentials(self, token):
+    def authenticate_credentials(self, request, token):
         secret = get_env_variable('SECRET_KEY')
-        payload = jwt.decode(token, secret)
-        userid = payload['id']
         msg = {'Error': "Token mismatch",'status' :"401"}
         try:
-            user = ClubUser.objects.get(id=userid)
-            if not user.token['token'] == token:
-                raise exceptions.AuthenticationFailed(msg)
-            #reset user to active
-            user.is_active = True
-            user.save()
-               
-        except jwt.ExpiredSignature or jwt.DecodeError or jwt.InvalidTokenError:
+            payload = jwt.decode(token, secret, algorithms=[ta_settings.JWT_ALGORITHM])
+        except (jwt.DecodeError, jwt.ExpiredSignatureError):
             return Response({'Error': "Token is invalid"}, status="403")
-        except User.DoesNotExist:
-            return Response({'Error': "Internal server error"}, status="500") 
+        
+        user = ClubUser.objects.get(id=payload['user_id'])
+        #reset user to active
+        user.is_active = True
+        user.save()
 
-        return (user, token)
+        request.user = user
+
+        return user

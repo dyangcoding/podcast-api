@@ -1,4 +1,4 @@
-Hello!
+Hi there!
 
 This email contains your secret login link. To log in,
 just click the link below, and please don't share it with anyone, or they will
@@ -6,7 +6,7 @@ be able to access your account.
 
 Click to log in:
 
-https://{% url "tokenauth:login-token" token %}
+{{ auth_url }}
 
 Thanks!
 The team
