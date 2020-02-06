@@ -2,8 +2,6 @@ from rest_framework import status
 from rest_framework.response import Response
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect
-from django.utils.translation import ugettext_lazy as _
 from rest_framework.decorators import api_view
 from rest_framework.decorators import parser_classes
 from rest_framework.parsers import JSONParser
@@ -32,8 +30,8 @@ def email_post(request, format=None):
 
     email_login_link(request, email)
     
-    return Response({'Info': 'Login email sent! Please check ' \ 
-        'your inbox and click on the link to be logged in.'}, 
+    return Response({'Info': 'Login email sent! Please check \
+        your inbox and click on the link to be logged in.'}, 
         status=status.HTTP_200_OK)
 
 @api_view(['POST'])
@@ -53,7 +51,7 @@ def token_post(request, token=None):
     djlogin(request, user)
     return Response(
         json.dumps(user.email), 
-        status=200, 
+        status=status.HTTP_200_OK, 
         content_type="application/json")
 
 @login_required

@@ -4,7 +4,7 @@ from podcast.users.models import ClubUser
 from . import settings as ta_settings
 from rest_framework.authentication import get_authorization_header
 from rest_framework.response import Response
-from podcast.settings.base import get_env_variable
+from django.conf import settings
 import jwt
 
 class JWTTokenBackend:
@@ -41,18 +41,19 @@ class JWTTokenBackend:
         return self.authenticate_credentials(request, token)
     
     def authenticate_credentials(self, request, token):
-        secret = get_env_variable('SECRET_KEY')
-        msg = {'Error': "Token mismatch",'status' :"401"}
         try:
-            payload = jwt.decode(token, secret, algorithms=[ta_settings.JWT_ALGORITHM])
+            payload = jwt.decode(token, settings.SECRET_KEY, \
+                algorithms=[ta_settings.JWT_ALGORITHM])
         except (jwt.DecodeError, jwt.ExpiredSignatureError):
-            return Response({'Error': "Token is invalid"}, status="403")
-        
-        user = ClubUser.objects.get(id=payload['user_id'])
+            return Response({'Error': "Token is invalid"}, 
+                status=status.HTTP_403_FORBIDDEN)
+        try:
+            user = self.get_user(user_id=payload['user_id'])
+        except ClubUser.DoesNotExist:
+            return Response({'Error': 'Internal server error'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         #reset user to active
         user.is_active = True
         user.save()
-
         request.user = user
-
         return user
