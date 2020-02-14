@@ -30,8 +30,8 @@ def email_post(request, format=None):
 
     email_login_link(request, email)
     
-    return Response({'Info': 'Login email sent! Please check \
-        your inbox and click on the link to be logged in.'}, 
+    return Response({'Info': 'Login email sent! Please check ' +
+        'your inbox and click on the link to be logged in.'}, 
         status=status.HTTP_200_OK)
 
 @api_view(['POST'])
