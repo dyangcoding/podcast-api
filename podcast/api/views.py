@@ -9,6 +9,7 @@ from functools import reduce
 from rest_framework.response import Response
 from rest_framework.exceptions import APIException
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import IsAuthenticated
 
 class MethodUnavailable(APIException):
     status_code = 503
@@ -23,6 +24,7 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     """
     API endpoint that allows users to be viewed.
     """
+    permission_classes = [IsAuthenticated]
     queryset = ClubUser.objects.all().order_by('-date_joined')
     serializer_class = ClubUserSerializer
 

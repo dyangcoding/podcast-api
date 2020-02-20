@@ -38,15 +38,16 @@ def email_post(request, format=None):
 @parser_classes([JSONParser])
 def token_post(request, token=None):
     """Validate the token the user submitted."""
+    if request.user.is_authenticated:
+        return Response({'Error': "You are already logged in."}, 
+            status=status.HTTP_202_ACCEPTED)
+    
     user = authenticate(request, token=token)
+
     if user is None:
         return Response({'Error': "The login link is invalid or has expired, \
             or you are not allowed to log in, please try again."}, 
             status=status.HTTP_400_BAD_REQUEST)
-
-    if request.user.is_authenticated:
-        return Response({'Error': "You are already logged in."}, 
-            status=status.HTTP_202_ACCEPTED)
 
     djlogin(request, user)
     return Response(
