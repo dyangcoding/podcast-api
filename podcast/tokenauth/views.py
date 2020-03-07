@@ -11,6 +11,8 @@ from . import settings as ta_settings
 from .helpers import email_login_link
 from podcast.users.models import ClubUser
 import json
+from django.http import JsonResponse
+from django.forms.models import model_to_dict
 
 @api_view(['POST'])
 @parser_classes([JSONParser])
@@ -50,10 +52,7 @@ def token_post(request, token=None):
             status=status.HTTP_400_BAD_REQUEST)
 
     djlogin(request, user)
-    return Response(
-        json.dumps(user.email), 
-        status=status.HTTP_200_OK, 
-        content_type="application/json")
+    return JsonResponse(model_to_dict(user))
 
 @login_required
 def logout(request):

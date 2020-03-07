@@ -31,9 +31,14 @@ class RssItem(models.Model):
     enclosure = models.TextField(default=None, null=True)
     episode_number = models.IntegerField(default=0, null=True)
     likes = models.IntegerField(default=0)
+    views = models.IntegerField(default=0)
     GUID = models.UUIDField(editable=False)
     creator = models.ForeignKey('Podcast', related_name='items', on_delete=models.CASCADE)
 
     def upVote(self):
         self.likes = self.likes + 1
+        self.save()
+    
+    def increase_views(self):
+        self.views = self.views + 1
         self.save()

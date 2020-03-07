@@ -109,9 +109,12 @@ class RssItemViewSet(UpdateModelMixin, viewsets.ReadOnlyModelViewSet):
     
     def partial_update(self, request, *args, **kwargs):
         try: 
-         if (request.data['upVote']):
-            item = self.get_object()
-            item.upVote()
+            if (request.data.get('upVote')):
+                item = self.get_object()
+                item.upVote()
+            if (request.data.get('increaseViews')):
+                item = self.get_object()
+                item.increase_views()
         except KeyError:
             raise MethodUnavailable
         return super().partial_update(request, *args, **kwargs)
